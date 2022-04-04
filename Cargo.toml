@@ -1,0 +1,18 @@
+[package]
+name = "youtube-dl-gui"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.ytdl]
+package = "youtube_dl"
+version = "0.7"
+git = "https://github.com/ticky/youtube-dl-rs"
+branch = "allow-downloading-via-yt-dlp"
+features = ["yt-dlp"]
+default-features = false
+
+[dependencies.adw]
+version = "0.1"
+package = "libadwaita"
