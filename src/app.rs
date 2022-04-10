@@ -1,8 +1,8 @@
-use adw::glib;
+use adw::{glib, Clamp};
 use adw::glib::clone;
-use adw::gtk::{Box, Entry, HeaderBar, ListBox, Orientation};
+use adw::gtk::{Box, Entry, HeaderBar, ListBox, Orientation, Button};
 use adw::Application;
-use adw::{prelude::*, ActionRow, ApplicationWindow};
+use adw::{prelude::*, ApplicationWindow};
 
 use crate::download::download_link;
 
@@ -29,14 +29,20 @@ fn build_ui(app: &Application) {
 	let btn_download = build_download_button();
 	let ent_download = build_download_entry_box();
 
-	btn_download.connect_activated(clone!(@weak ent_download => move |_| {
+	btn_download.connect_clicked(clone!(@weak ent_download => move |_| {
 		download_link(ent_download.text());
 	}));
-
+	let btn_download_clamp = Clamp::builder()
+		.maximum_size(128)
+		.tightening_threshold(96)
+		.child(&btn_download)
+		.maximum_size(128)
+		.tightening_threshold(128)
+		.build();
+	
 	box_download.append(&ent_download);
-	box_download.append(&btn_download);
-
 	content.append(&box_download);
+	content.append(&btn_download_clamp);
 
 	let window = build_window(app, &content);
 	window.show();
@@ -61,18 +67,20 @@ fn build_download_box() -> ListBox {
 	ListBox::builder()
 		.margin_top(32)
 		.margin_end(32)
-		.margin_bottom(32)
+		.margin_bottom(8)
 		.margin_start(32)
 		// the content class makes the list look nicer
 		.css_classes(vec![String::from("content")])
 		.build()
 }
 
-fn build_download_button() -> ActionRow {
-	ActionRow::builder()
-		.activatable(true)
-		.selectable(false)
-		.title("Download")
+fn build_download_button() -> Button {
+	Button::builder()
+		.label("Download")
+		.margin_top(8)
+		.margin_end(32)
+		.margin_bottom(16)
+		.margin_start(32)
 		.build()
 }
 
