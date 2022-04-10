@@ -53,11 +53,7 @@ fn build_window(app: &Application, content: &Box) -> ApplicationWindow {
 
 fn build_content() -> Box {
 	let content = Box::new(Orientation::Vertical, 0);
-	content.append(
-		&HeaderBar::builder()
-			.title_widget(&adw::WindowTitle::new("Youtube Download", ""))
-			.build(),
-	);
+	content.append(&build_headerbar());
 	content
 }
 
@@ -84,4 +80,10 @@ fn build_download_entry_box() -> Entry {
 	Entry::builder()
 		.tooltip_text("Paste a youtube download link here")
 		.build()
+}
+
+fn build_headerbar() -> HeaderBar {
+	HeaderBar::builder()
+			.title_widget(&adw::WindowTitle::new("Youtube Download", ""))
+			.build()
 }
