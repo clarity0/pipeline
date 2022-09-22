@@ -13,7 +13,7 @@ pub fn run_app() -> i32 {
 
 fn build_app() -> Application {
 	let application = Application::builder()
-		.application_id("com.example.FirstAdwaitaApp")
+		.application_id("com.clarity0.pipeline")
 		.build();
 
 	application.connect_startup(|_| {
