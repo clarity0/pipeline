@@ -1,8 +1,11 @@
-use adw::{glib, Clamp};
+use std::thread;
+
 use adw::glib::clone;
-use adw::gtk::{Box, Entry, HeaderBar, ListBox, Orientation, Button};
+use adw::gtk::{Box, Button, Entry, HeaderBar, ListBox, Orientation};
 use adw::Application;
+use adw::{glib, Clamp};
 use adw::{prelude::*, ApplicationWindow};
+use ytdl::YoutubeDlOutput::{Playlist, SingleVideo};
 
 use crate::download::download_link;
 
@@ -29,8 +32,13 @@ fn build_ui(app: &Application) {
 	let btn_download = build_download_button();
 	let ent_download = build_download_entry_box();
 
+	//let (tx, rx) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
+
 	btn_download.connect_clicked(clone!(@weak ent_download => move |_| {
-		download_link(ent_download.text());
+		let link = ent_download.text();
+		thread::spawn(move || {
+			download_link(link)
+		});
 	}));
 	let btn_download_clamp = Clamp::builder()
 		.maximum_size(128)
@@ -39,7 +47,7 @@ fn build_ui(app: &Application) {
 		.maximum_size(128)
 		.tightening_threshold(128)
 		.build();
-	
+
 	box_download.append(&ent_download);
 	content.append(&box_download);
 	content.append(&btn_download_clamp);
@@ -92,6 +100,6 @@ fn build_download_entry_box() -> Entry {
 
 fn build_headerbar() -> HeaderBar {
 	HeaderBar::builder()
-			.title_widget(&adw::WindowTitle::new("Youtube Download", ""))
-			.build()
+		.title_widget(&adw::WindowTitle::new("Youtube Download", ""))
+		.build()
 }
