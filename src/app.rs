@@ -1,11 +1,9 @@
-use std::thread;
-
 use adw::glib::clone;
 use adw::gtk::{Box, Button, Entry, HeaderBar, ListBox, Orientation};
 use adw::Application;
 use adw::{glib, Clamp};
 use adw::{prelude::*, ApplicationWindow};
-use ytdl::YoutubeDlOutput::{Playlist, SingleVideo};
+use std::thread;
 
 use crate::download::download_link;
 
@@ -32,14 +30,21 @@ fn build_ui(app: &Application) {
 	let btn_download = build_download_button();
 	let ent_download = build_download_entry_box();
 
-	//let (tx, rx) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
+	let (tx, rx) = glib::MainContext::channel(glib::PRIORITY_DEFAULT);
 
 	btn_download.connect_clicked(clone!(@weak ent_download => move |_| {
 		let link = ent_download.text();
-		thread::spawn(move || {
-			download_link(link)
-		});
+		thread::spawn(clone!(@strong tx => move || {
+			download_link(link);
+			tx.send("Download finished").expect("Could not send to channel");
+		}));
 	}));
+
+	rx.attach(None, move |text| {
+		println!("{}", text);
+		glib::Continue(true)
+	});
+
 	let btn_download_clamp = Clamp::builder()
 		.maximum_size(128)
 		.tightening_threshold(96)
